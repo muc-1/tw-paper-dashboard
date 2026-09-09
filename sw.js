@@ -1,11 +1,13 @@
-// 紙上交易儀表板 — 極簡 service worker
-// 外殼(html/manifest/icon)cache-first;data.json / report.html 一律走網路(拿最新),
-// 失敗時 index.html 自己有 localStorage 舊資料備援。
-const SHELL = 'pt-shell-v1';
-const FILES = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
+// 紙上交易儀表板 — service worker
+// 會變的東西(index.html / *.json / report.html)一律「先網路、失敗才快取」,
+// 這樣改版後重新整理一定拿得到新版,不會卡舊快取。
+// 只有真正靜態的(manifest / icon)才「先快取」。
+const SHELL = 'pt-shell-v3';
+const STATIC = ['./manifest.json', './icon-192.png', './icon-512.png'];
+const NET_FIRST = ['/', '/index.html', '/data.json', '/xs.json', '/report.html'];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(SHELL).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
+  e.waitUntil(caches.open(SHELL).then(c => c.addAll(STATIC)).then(() => self.skipWaiting()));
 });
 self.addEventListener('activate', e => {
   e.waitUntil(
@@ -14,10 +16,17 @@ self.addEventListener('activate', e => {
   );
 });
 self.addEventListener('fetch', e => {
-  const url = new URL(e.request.url);
-  if (url.pathname.endsWith('/data.json') || url.pathname.endsWith('/report.html')) {
-    e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
-    return;
+  const p = new URL(e.request.url).pathname;
+  const netFirst = NET_FIRST.some(x => p === x || p.endsWith(x));
+  if (netFirst) {
+    e.respondWith(
+      fetch(e.request).then(r => {
+        const copy = r.clone();
+        caches.open(SHELL).then(c => c.put(e.request, copy)).catch(() => {});
+        return r;
+      }).catch(() => caches.match(e.request))
+    );
+  } else {
+    e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
   }
-  e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
 });
