@@ -1,0 +1,207 @@
+{
+ "updated": "2026-09-09 09:33 UTC",
+ "label": "XS 午夜反轉 · 加密貨幣多空",
+ "init": 10000.0,
+ "equity": 9873.76,
+ "day_ret": 0.005169,
+ "total_ret": -0.012623868942327365,
+ "n_names": 35,
+ "kind": "REBALANCE",
+ "note": "",
+ "inception": "2026-09-06",
+ "positions": [
+  {
+   "sym": "DOT",
+   "notional": 988.3,
+   "side": "多"
+  },
+  {
+   "sym": "INJ",
+   "notional": -733.6,
+   "side": "空"
+  },
+  {
+   "sym": "JUP",
+   "notional": -725.3,
+   "side": "空"
+  },
+  {
+   "sym": "ICP",
+   "notional": 655.2,
+   "side": "多"
+  },
+  {
+   "sym": "APT",
+   "notional": -526.2,
+   "side": "空"
+  },
+  {
+   "sym": "POL",
+   "notional": 508.0,
+   "side": "多"
+  },
+  {
+   "sym": "TIA",
+   "notional": 481.1,
+   "side": "多"
+  },
+  {
+   "sym": "DASH",
+   "notional": -478.6,
+   "side": "空"
+  },
+  {
+   "sym": "WLD",
+   "notional": -347.8,
+   "side": "空"
+  },
+  {
+   "sym": "ZEC",
+   "notional": -311.6,
+   "side": "空"
+  },
+  {
+   "sym": "NEAR",
+   "notional": -309.8,
+   "side": "空"
+  },
+  {
+   "sym": "AVAX",
+   "notional": 281.9,
+   "side": "多"
+  },
+  {
+   "sym": "SUI",
+   "notional": -281.6,
+   "side": "空"
+  },
+  {
+   "sym": "ETC",
+   "notional": -280.7,
+   "side": "空"
+  },
+  {
+   "sym": "SEI",
+   "notional": 276.9,
+   "side": "多"
+  },
+  {
+   "sym": "HBAR",
+   "notional": 275.7,
+   "side": "多"
+  },
+  {
+   "sym": "ARB",
+   "notional": 265.1,
+   "side": "多"
+  },
+  {
+   "sym": "PENDLE",
+   "notional": 249.0,
+   "side": "多"
+  },
+  {
+   "sym": "ENA",
+   "notional": -246.8,
+   "side": "空"
+  },
+  {
+   "sym": "SUSHI",
+   "notional": 243.2,
+   "side": "多"
+  },
+  {
+   "sym": "FIL",
+   "notional": -186.9,
+   "side": "空"
+  },
+  {
+   "sym": "LDO",
+   "notional": -185.1,
+   "side": "空"
+  },
+  {
+   "sym": "LTC",
+   "notional": 161.5,
+   "side": "多"
+  },
+  {
+   "sym": "LINK",
+   "notional": 151.8,
+   "side": "多"
+  },
+  {
+   "sym": "OP",
+   "notional": 138.2,
+   "side": "多"
+  },
+  {
+   "sym": "DOGE",
+   "notional": -124.5,
+   "side": "空"
+  },
+  {
+   "sym": "TRX",
+   "notional": 107.4,
+   "side": "多"
+  },
+  {
+   "sym": "ADA",
+   "notional": -99.4,
+   "side": "空"
+  },
+  {
+   "sym": "BCH",
+   "notional": 80.4,
+   "side": "多"
+  },
+  {
+   "sym": "AAVE",
+   "notional": -65.2,
+   "side": "空"
+  },
+  {
+   "sym": "XRP",
+   "notional": 53.3,
+   "side": "多"
+  },
+  {
+   "sym": "SOL",
+   "notional": -38.4,
+   "side": "空"
+  },
+  {
+   "sym": "CRV",
+   "notional": 16.4,
+   "side": "多"
+  },
+  {
+   "sym": "XLM",
+   "notional": 6.6,
+   "side": "多"
+  },
+  {
+   "sym": "BNB",
+   "notional": 1.5,
+   "side": "多"
+  }
+ ],
+ "equity_hist": [
+  [
+   "2026-09-06",
+   9992.82
+  ],
+  [
+   "2026-09-07",
+   10188.65
+  ],
+  [
+   "2026-09-08",
+   9822.99
+  ],
+  [
+   "2026-09-09",
+   9873.76
+  ]
+ ]
+}
