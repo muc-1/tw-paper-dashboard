@@ -134,7 +134,29 @@ function trackCard(t){
   </section>`;
 }
 
-function render(d){
+function xsCard(x){
+  if(!x || x.equity==null) return '';
+  const pos = (x.positions||[]).slice(0,10).map(p=>`<tr>
+    <td>${p.sym}</td>
+    <td class="${p.side==='多'?'up':'dn'}">${p.side}</td>
+    <td class="num">${fmt(Math.abs(p.notional))}</td></tr>`).join('');
+  return `<section class="card">
+    <div class="tlabel">${x.label||'XS 午夜反轉'} · 起 ${x.inception||'—'}</div>
+    <div class="nav num">${fmt(x.equity)}<small>USDT</small></div>
+    <div class="chips">
+      <div class="chip"><div class="k">當日</div><div class="v num ${cls(x.day_ret)}">${pct(x.day_ret)}</div></div>
+      <div class="chip"><div class="k">總報酬</div><div class="v num ${cls(x.total_ret)}">${pct(x.total_ret)}</div></div>
+      <div class="chip"><div class="k">檔數</div><div class="v num">${x.n_names??'—'}</div></div>
+      <div class="chip"><div class="k">狀態</div><div class="v" style="font-size:.8rem">${x.kind||'—'}</div></div>
+    </div>
+    ${spark(x.equity_hist)}
+    <table><tr><th>幣</th><th>方向</th><th>名目 USDT</th></tr>${pos||'<tr><td colspan=3 style="text-align:center;color:var(--muted)">無持倉</td></tr>'}</table>
+    <div class="meta">加密貨幣多空 · 本金 ${fmt(x.init)} USDT · 每日 01:00 UTC 再平衡${x.note? ' · '+x.note : ''}
+      <br><span style="opacity:.7">更新 ${x.updated||'—'}</span></div>
+  </section>`;
+}
+
+function render(d, xs){
   document.getElementById('upd').textContent = '更新 ' + d.updated;
   const bad = !d.health.ok;
   const hLine = (d.health.text||'').split('\n').slice(0,2).join(' ');
@@ -142,19 +164,28 @@ function render(d){
     <div style="font-size:.74rem;color:var(--muted);margin-top:2px">${hLine}</div></div>`;
   html += trackCard(d.tracks.main);
   html += trackCard(d.tracks.sim);
+  html += xsCard(xs);
   document.getElementById('root').innerHTML = html;
 }
 
 async function load(){
+  let d = null, xs = null;
   try{
     const r = await fetch('./data.json?_=' + Date.now(), {cache:'no-store'});
-    if(!r.ok) throw 0;
-    const d = await r.json();
-    render(d);
-    try{ localStorage.setItem('pt_cache', JSON.stringify(d)); }catch(e){}
-  }catch(e){
-    const c = (()=>{ try{ return JSON.parse(localStorage.getItem('pt_cache')); }catch(_){ return null; }})();
-    if(c){ render(c); document.getElementById('upd').textContent = '離線(舊資料 ' + c.updated + ')'; }
+    if(r.ok) d = await r.json();
+  }catch(e){}
+  try{
+    const rx = await fetch('./xs.json?_=' + Date.now(), {cache:'no-store'});
+    if(rx.ok) xs = await rx.json();
+  }catch(e){}
+  if(d){
+    render(d, xs);
+    try{ localStorage.setItem('pt_cache', JSON.stringify(d));
+         if(xs) localStorage.setItem('xs_cache', JSON.stringify(xs)); }catch(e){}
+  }else{
+    const c  = (()=>{ try{ return JSON.parse(localStorage.getItem('pt_cache')); }catch(_){ return null; }})();
+    const cx = (()=>{ try{ return JSON.parse(localStorage.getItem('xs_cache')); }catch(_){ return null; }})();
+    if(c){ render(c, xs||cx); document.getElementById('upd').textContent = '離線(舊資料 ' + c.updated + ')'; }
     else { document.getElementById('root').innerHTML = '<div class="err">讀取失敗,稍後再試</div>'; }
   }
 }
