@@ -102,6 +102,12 @@ function spark(hist){
 }
 
 function trackCard(t){
+  if(t.disabled){
+    return `<section class="card" style="opacity:.6">
+      <div class="tlabel">${t.label}</div>
+      <div style="color:var(--muted);font-size:.85rem">已停用 — 只跑 main 軌道</div>
+    </section>`;
+  }
   const rows = (t.positions||[]).map(p=>`<tr>
     <td>${p.sid}<span class="nm">${p.name||''}</span></td>
     <td class="num">${fmt(p.qty)}</td>
