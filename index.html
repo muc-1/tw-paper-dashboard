@@ -77,6 +77,10 @@ const fmt = (n,d=0)=> (n==null||isNaN(n)) ? '—' :
   Number(n).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
 const pct = n => (n==null||isNaN(n)) ? '—' : (n>=0?'+':'') + (n*100).toFixed(2) + '%';
 const cls = n => n>0 ? 'up' : n<0 ? 'dn' : '';
+// 所有從 data.json / xs.json 來的字串塞進 innerHTML 前都要過這關(防 XSS)
+const esc = s => String(s==null?'':s).replace(/[&<>"']/g,
+  c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const num = n => (n==null||isNaN(n)) ? '—' : String(Number(n));
 
 function spark(hist){
   if(!hist || hist.length<2) return '';
@@ -104,19 +108,19 @@ function spark(hist){
 function trackCard(t){
   if(t.disabled){
     return `<section class="card" style="opacity:.6">
-      <div class="tlabel">${t.label}</div>
+      <div class="tlabel">${esc(t.label)}</div>
       <div style="color:var(--muted);font-size:.85rem">已停用 — 只跑 main 軌道</div>
     </section>`;
   }
   const rows = (t.positions||[]).map(p=>`<tr>
-    <td>${p.sid}<span class="nm">${p.name||''}</span></td>
+    <td>${esc(p.sid)}<span class="nm">${esc(p.name||'')}</span></td>
     <td class="num">${fmt(p.qty)}</td>
     <td class="num">${fmt(p.px,2)}</td>
-    <td class="num ${cls(p.pnl_pct)}">${(p.pnl_pct>=0?'+':'')+p.pnl_pct}%</td>
+    <td class="num ${cls(p.pnl_pct)}">${(p.pnl_pct>=0?'+':'')+num(p.pnl_pct)}%</td>
     <td class="num">${fmt(p.mv)}</td></tr>`).join('') ||
     `<tr><td colspan="5" style="text-align:center;color:var(--muted)">（空手 / 無持倉）</td></tr>`;
   return `<section class="card">
-    <div class="tlabel">${t.label} · 資料日 ${t.data_date||'—'}</div>
+    <div class="tlabel">${esc(t.label)} · 資料日 ${esc(t.data_date||'—')}</div>
     <div class="nav num">${fmt(t.nav)}<small>NT$</small></div>
     <div class="chips">
       <div class="chip"><div class="k">當日</div><div class="v num ${cls(t.day_ret)}">${pct(t.day_ret)}</div></div>
@@ -129,37 +133,37 @@ function trackCard(t){
       <tr><th>代號</th><th>股數</th><th>現價</th><th>未實現</th><th>市值</th></tr>
       ${rows}
     </table>
-    <div class="meta">PROFILE ${t.profile} · 本金 NT$${fmt(t.init)} · ${t.n_hold} 檔 ·
-      每 ${t.rebal_days} 交易日換股${t.last_order? ' · 上次換股 '+t.last_order : ''}</div>
+    <div class="meta">PROFILE ${esc(t.profile)} · 本金 NT$${fmt(t.init)} · ${num(t.n_hold)} 檔 ·
+      每 ${num(t.rebal_days)} 交易日換股${t.last_order? ' · 上次換股 '+esc(t.last_order) : ''}</div>
   </section>`;
 }
 
 function xsCard(x){
   if(!x || x.equity==null) return '';
   const pos = (x.positions||[]).slice(0,10).map(p=>`<tr>
-    <td>${p.sym}</td>
-    <td class="${p.side==='多'?'up':'dn'}">${p.side}</td>
+    <td>${esc(p.sym)}</td>
+    <td class="${p.side==='多'?'up':'dn'}">${esc(p.side)}</td>
     <td class="num">${fmt(Math.abs(p.notional))}</td></tr>`).join('');
   return `<section class="card">
-    <div class="tlabel">${x.label||'XS 午夜反轉'} · 起 ${x.inception||'—'}</div>
+    <div class="tlabel">${esc(x.label||'XS 午夜反轉')} · 起 ${esc(x.inception||'—')}</div>
     <div class="nav num">${fmt(x.equity)}<small>USDT</small></div>
     <div class="chips">
       <div class="chip"><div class="k">當日</div><div class="v num ${cls(x.day_ret)}">${pct(x.day_ret)}</div></div>
       <div class="chip"><div class="k">總報酬</div><div class="v num ${cls(x.total_ret)}">${pct(x.total_ret)}</div></div>
-      <div class="chip"><div class="k">檔數</div><div class="v num">${x.n_names??'—'}</div></div>
-      <div class="chip"><div class="k">狀態</div><div class="v" style="font-size:.8rem">${x.kind||'—'}</div></div>
+      <div class="chip"><div class="k">檔數</div><div class="v num">${num(x.n_names)}</div></div>
+      <div class="chip"><div class="k">狀態</div><div class="v" style="font-size:.8rem">${esc(x.kind||'—')}</div></div>
     </div>
     ${spark(x.equity_hist)}
     <table><tr><th>幣</th><th>方向</th><th>名目 USDT</th></tr>${pos||'<tr><td colspan=3 style="text-align:center;color:var(--muted)">無持倉</td></tr>'}</table>
-    <div class="meta">加密貨幣多空 · 本金 ${fmt(x.init)} USDT · 每日 01:00 UTC 再平衡${x.note? ' · '+x.note : ''}
-      <br><span style="opacity:.7">更新 ${x.updated||'—'}</span></div>
+    <div class="meta">加密貨幣多空 · 本金 ${fmt(x.init)} USDT · 每日 01:00 UTC 再平衡${x.note? ' · '+esc(x.note) : ''}
+      <br><span style="opacity:.7">更新 ${esc(x.updated||'—')}</span></div>
   </section>`;
 }
 
 function render(d, xs){
   document.getElementById('upd').textContent = '更新 ' + d.updated;
   const bad = !d.health.ok;
-  const hLine = (d.health.text||'').split('\n').slice(0,2).join(' ');
+  const hLine = esc((d.health.text||'').split('\n').slice(0,2).join(' '));
   let html = `<div class="banner ${bad?'bad':''}"><b>系統健康</b> · ${bad?'有異常 ✗':'全部正常 ✔'}
     <div style="font-size:.74rem;color:var(--muted);margin-top:2px">${hLine}</div></div>`;
   html += trackCard(d.tracks.main);
