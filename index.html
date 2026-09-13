@@ -13,13 +13,13 @@
 <style>
   :root{
     --bg:#f4f1e9; --card:#fffdf7; --ink:#2b2721; --muted:#8a8173;
-    --line:#e7e0cf; --gold:#a9812f; --green:#2f7d5d; --red:#c0392b;
+    --line:#e7e0cf; --gold:#a9812f; --green:#2f7d5d; --red:#c0392b; --yellow:#b8862e;
     --chip:#faf6ec;
   }
   @media (prefers-color-scheme: dark){
     :root{
       --bg:#17150f; --card:#221f16; --ink:#e9e3d4; --muted:#9a917f;
-      --line:#332f22; --gold:#d8ab55; --green:#5cbf95; --red:#e0736a; --chip:#1c1a12;
+      --line:#332f22; --gold:#d8ab55; --green:#5cbf95; --red:#e0736a; --yellow:#e0b45a; --chip:#1c1a12;
     }
   }
   *{box-sizing:border-box}
@@ -48,6 +48,11 @@
   .chip .k{font-size:.62rem;color:var(--muted);letter-spacing:.05em;text-transform:uppercase}
   .chip .v{font-size:1rem;font-weight:600}
   .up{color:var(--green)} .dn{color:var(--red)}
+  .dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px;vertical-align:1px}
+  .dot.green{background:var(--green)} .dot.yellow{background:var(--yellow)}
+  .dot.red{background:var(--red)} .dot.na{background:var(--muted)}
+  .mono-sm{font-size:.8rem}
+  .subhead{font-size:.68rem;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin:12px 0 4px}
   svg.spark{display:block;width:100%;height:44px;margin:6px 0 10px}
   table{width:100%;border-collapse:collapse;font-size:.82rem}
   th,td{padding:5px 4px;border-bottom:1px solid var(--line);text-align:right}
@@ -105,6 +110,26 @@ function spark(hist){
   </svg>`;
 }
 
+function driftChip(dr){
+  if(!dr || dr.status==='na'){
+    return `<div class="chip"><div class="k">追蹤誤差</div>
+      <div class="v mono-sm"><span class="dot na"></span>${esc((dr&&dr.note)||'—')}</div></div>`;
+  }
+  return `<div class="chip"><div class="k">追蹤誤差</div>
+    <div class="v mono-sm"><span class="dot ${dr.status}"></span>${(dr.te*100).toFixed(1)}%/年</div></div>`;
+}
+
+function monthlyTable(monthly){
+  const ms = (monthly||[]).filter(m=>m.ret!=null);
+  if(!ms.length) return '';
+  const rows = ms.slice().reverse().map(m=>`<tr>
+    <td>${esc(m.ym)}</td>
+    <td class="num ${cls(m.ret)}">${pct(m.ret)}</td>
+    <td class="num">${fmt(m.nav)}</td></tr>`).join('');
+  return `<div class="subhead">逐月報酬</div>
+    <table><tr><th>月份</th><th>報酬</th><th>月底 NAV</th></tr>${rows}</table>`;
+}
+
 function trackCard(t){
   if(t.disabled){
     return `<section class="card" style="opacity:.6">
@@ -119,6 +144,9 @@ function trackCard(t){
     <td class="num ${cls(p.pnl_pct)}">${(p.pnl_pct>=0?'+':'')+num(p.pnl_pct)}%</td>
     <td class="num">${fmt(p.mv)}</td></tr>`).join('') ||
     `<tr><td colspan="5" style="text-align:center;color:var(--muted)">（空手 / 無持倉）</td></tr>`;
+  const nr = t.next_rebalance;
+  const nrText = nr==null ? '' :
+    (nr===0 ? ' · 下次換股：下個交易日' : ` · 下次換股：約 ${num(nr)} 個交易日後`);
   return `<section class="card">
     <div class="tlabel">${esc(t.label)} · 資料日 ${esc(t.data_date||'—')}</div>
     <div class="nav num">${fmt(t.nav)}<small>NT$</small></div>
@@ -127,14 +155,16 @@ function trackCard(t){
       <div class="chip"><div class="k">總報酬</div><div class="v num ${cls(t.total_ret)}">${pct(t.total_ret)}</div></div>
       <div class="chip"><div class="k">Regime</div><div class="v">${t.regime_on?'ON':'OFF'}</div></div>
       <div class="chip"><div class="k">現金</div><div class="v num">${fmt(t.cash)}</div></div>
+      ${driftChip(t.drift)}
     </div>
     ${spark(t.nav_hist)}
     <table>
       <tr><th>代號</th><th>股數</th><th>現價</th><th>未實現</th><th>市值</th></tr>
       ${rows}
     </table>
+    ${monthlyTable(t.monthly)}
     <div class="meta">PROFILE ${esc(t.profile)} · 本金 NT$${fmt(t.init)} · ${num(t.n_hold)} 檔 ·
-      每 ${num(t.rebal_days)} 交易日換股${t.last_order? ' · 上次換股 '+esc(t.last_order) : ''}</div>
+      每 ${num(t.rebal_days)} 交易日換股${t.last_order? ' · 上次換股 '+esc(t.last_order) : ''}${nrText}</div>
   </section>`;
 }
 
