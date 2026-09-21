@@ -1,8 +1,8 @@
 {
- "updated": "2026-09-21 15:05",
+ "updated": "2026-09-21 22:27",
  "health": {
   "ok": true,
-  "text": "紙上交易健康檢查 · 2026-09-21 15:05\n總結:全部正常 ✔\n\n  [OK  ] 面板資料 — 最後 2026-09-21,落後約 0 個平日\n  [OK  ] main 軌道(lite10k) — nav.csv 最後 2026-09-21\n  [OK  ] sim 軌道 — nav.csv 最後 2026-09-21\n  [OK  ] cron.log 錯誤 — 無\n  [OK  ] sim 對帳 — 正常"
+  "text": "紙上交易健康檢查 · 2026-09-21 22:27\n總結:全部正常 ✔\n\n  [OK  ] 面板資料 — 最後 2026-09-21,落後約 0 個平日\n  [OK  ] main 軌道(lite10k) — nav.csv 最後 2026-09-21\n  [OK  ] sim 軌道 — nav.csv 最後 2026-09-21\n  [OK  ] cron.log 錯誤 — 無\n  [OK  ] sim 對帳 — 正常"
  },
  "tracks": {
   "main": {
