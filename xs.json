@@ -1,189 +1,189 @@
 {
- "updated": "2026-09-22 17:46 UTC",
+ "updated": "2026-09-23 05:55 UTC",
  "label": "XS 午夜反轉 · 加密貨幣多空",
  "init": 10000.0,
- "equity": 8929.03,
- "day_ret": -0.00025499999999999996,
- "total_ret": -0.10709662096649097,
+ "equity": 8946.49,
+ "day_ret": 0.001955,
+ "total_ret": -0.10535092517995126,
  "n_names": 35,
  "kind": "REBALANCE",
  "note": "",
  "inception": "2026-09-06",
  "positions": [
   {
-   "sym": "WLD",
-   "notional": -893.5,
+   "sym": "ARB",
+   "notional": -895.7,
    "side": "空"
-  },
-  {
-   "sym": "APT",
-   "notional": 793.3,
-   "side": "多"
-  },
-  {
-   "sym": "NEAR",
-   "notional": -699.8,
-   "side": "空"
-  },
-  {
-   "sym": "SUI",
-   "notional": -609.1,
-   "side": "空"
-  },
-  {
-   "sym": "ALGO",
-   "notional": 538.2,
-   "side": "多"
-  },
-  {
-   "sym": "TRX",
-   "notional": -439.4,
-   "side": "空"
-  },
-  {
-   "sym": "FIL",
-   "notional": -318.7,
-   "side": "空"
-  },
-  {
-   "sym": "XTZ",
-   "notional": 279.6,
-   "side": "多"
-  },
-  {
-   "sym": "ZIL",
-   "notional": -277.4,
-   "side": "空"
-  },
-  {
-   "sym": "POL",
-   "notional": 269.6,
-   "side": "多"
-  },
-  {
-   "sym": "XRP",
-   "notional": 264.4,
-   "side": "多"
-  },
-  {
-   "sym": "CRV",
-   "notional": 255.1,
-   "side": "多"
-  },
-  {
-   "sym": "XLM",
-   "notional": 243.4,
-   "side": "多"
-  },
-  {
-   "sym": "ADA",
-   "notional": -242.9,
-   "side": "空"
-  },
-  {
-   "sym": "HBAR",
-   "notional": 239.9,
-   "side": "多"
-  },
-  {
-   "sym": "LINK",
-   "notional": 211.4,
-   "side": "多"
   },
   {
    "sym": "INJ",
-   "notional": 205.6,
-   "side": "多"
-  },
-  {
-   "sym": "SEI",
-   "notional": -197.2,
-   "side": "空"
-  },
-  {
-   "sym": "LTC",
-   "notional": 181.9,
-   "side": "多"
-  },
-  {
-   "sym": "ARB",
-   "notional": 177.4,
-   "side": "多"
-  },
-  {
-   "sym": "ZEC",
-   "notional": -177.0,
-   "side": "空"
-  },
-  {
-   "sym": "OP",
-   "notional": 170.9,
-   "side": "多"
-  },
-  {
-   "sym": "AVAX",
-   "notional": 170.5,
-   "side": "多"
-  },
-  {
-   "sym": "DASH",
-   "notional": -163.3,
-   "side": "空"
-  },
-  {
-   "sym": "DOT",
-   "notional": 151.4,
-   "side": "多"
-  },
-  {
-   "sym": "PENDLE",
-   "notional": -143.1,
-   "side": "空"
-  },
-  {
-   "sym": "BCH",
-   "notional": -110.2,
+   "notional": -895.7,
    "side": "空"
   },
   {
    "sym": "TIA",
-   "notional": 109.0,
+   "notional": 895.7,
+   "side": "多"
+  },
+  {
+   "sym": "AVAX",
+   "notional": 574.0,
+   "side": "多"
+  },
+  {
+   "sym": "XRP",
+   "notional": -454.6,
+   "side": "空"
+  },
+  {
+   "sym": "APT",
+   "notional": 425.3,
+   "side": "多"
+  },
+  {
+   "sym": "ICP",
+   "notional": 396.8,
+   "side": "多"
+  },
+  {
+   "sym": "DOT",
+   "notional": 318.5,
+   "side": "多"
+  },
+  {
+   "sym": "NEAR",
+   "notional": 307.4,
+   "side": "多"
+  },
+  {
+   "sym": "BCH",
+   "notional": 297.1,
+   "side": "多"
+  },
+  {
+   "sym": "ZEC",
+   "notional": 282.5,
+   "side": "多"
+  },
+  {
+   "sym": "OP",
+   "notional": 275.3,
+   "side": "多"
+  },
+  {
+   "sym": "XLM",
+   "notional": -246.9,
+   "side": "空"
+  },
+  {
+   "sym": "DOGE",
+   "notional": -244.8,
+   "side": "空"
+  },
+  {
+   "sym": "ETC",
+   "notional": -244.5,
+   "side": "空"
+  },
+  {
+   "sym": "JUP",
+   "notional": 220.6,
    "side": "多"
   },
   {
    "sym": "BNB",
-   "notional": 94.8,
-   "side": "多"
-  },
-  {
-   "sym": "AAVE",
-   "notional": 93.6,
-   "side": "多"
-  },
-  {
-   "sym": "JUP",
-   "notional": -88.5,
-   "side": "空"
-  },
-  {
-   "sym": "ENA",
-   "notional": -81.3,
-   "side": "空"
-  },
-  {
-   "sym": "ICP",
-   "notional": -24.3,
+   "notional": -218.1,
    "side": "空"
   },
   {
    "sym": "SOL",
-   "notional": 17.6,
+   "notional": -201.3,
+   "side": "空"
+  },
+  {
+   "sym": "SEI",
+   "notional": 201.2,
    "side": "多"
   },
   {
-   "sym": "DOGE",
-   "notional": -1.9,
+   "sym": "ENA",
+   "notional": -153.4,
    "side": "空"
+  },
+  {
+   "sym": "TRX",
+   "notional": -151.5,
+   "side": "空"
+  },
+  {
+   "sym": "FIL",
+   "notional": 144.9,
+   "side": "多"
+  },
+  {
+   "sym": "LDO",
+   "notional": -134.6,
+   "side": "空"
+  },
+  {
+   "sym": "ADA",
+   "notional": -115.9,
+   "side": "空"
+  },
+  {
+   "sym": "SUI",
+   "notional": -108.0,
+   "side": "空"
+  },
+  {
+   "sym": "PENDLE",
+   "notional": -99.8,
+   "side": "空"
+  },
+  {
+   "sym": "DASH",
+   "notional": -97.0,
+   "side": "空"
+  },
+  {
+   "sym": "HBAR",
+   "notional": -87.3,
+   "side": "空"
+  },
+  {
+   "sym": "AAVE",
+   "notional": -85.8,
+   "side": "空"
+  },
+  {
+   "sym": "POL",
+   "notional": 73.0,
+   "side": "多"
+  },
+  {
+   "sym": "ALGO",
+   "notional": -43.6,
+   "side": "空"
+  },
+  {
+   "sym": "LTC",
+   "notional": 32.3,
+   "side": "多"
+  },
+  {
+   "sym": "CRV",
+   "notional": 18.4,
+   "side": "多"
+  },
+  {
+   "sym": "WLD",
+   "notional": 13.2,
+   "side": "多"
+  },
+  {
+   "sym": "LINK",
+   "notional": 2.3,
+   "side": "多"
   }
  ],
  "equity_hist": [
@@ -254,6 +254,10 @@
   [
    "2026-09-22",
    8929.03
+  ],
+  [
+   "2026-09-23",
+   8946.49
   ]
  ]
 }
