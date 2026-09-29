@@ -198,6 +198,7 @@ function render(d, xs){
     <div style="font-size:.74rem;color:var(--muted);margin-top:2px">${hLine}</div></div>`;
   html += trackCard(d.tracks.main);
   html += trackCard(d.tracks.sim);
+  if(d.tracks.wf) html += trackCard(d.tracks.wf);
   html += xsCard(xs);
   document.getElementById('root').innerHTML = html;
 }
