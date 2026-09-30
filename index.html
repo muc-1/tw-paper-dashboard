@@ -149,7 +149,7 @@ function trackCard(t){
     (nr===0 ? ' · 下次換股：下個交易日' : ` · 下次換股：約 ${num(nr)} 個交易日後`);
   return `<section class="card">
     <div class="tlabel">${esc(t.label)} · 資料日 ${esc(t.data_date||'—')}</div>
-    <div class="nav num">${fmt(t.nav)}<small>NT$</small></div>
+    <div class="nav num">${fmt(t.nav)}<small>${esc(t.currency||'NT$')}</small></div>
     <div class="chips">
       <div class="chip"><div class="k">當日</div><div class="v num ${cls(t.day_ret)}">${pct(t.day_ret)}</div></div>
       <div class="chip"><div class="k">總報酬</div><div class="v num ${cls(t.total_ret)}">${pct(t.total_ret)}</div></div>
@@ -163,7 +163,7 @@ function trackCard(t){
       ${rows}
     </table>
     ${monthlyTable(t.monthly)}
-    <div class="meta">PROFILE ${esc(t.profile)} · 本金 NT$${fmt(t.init)} · ${num(t.n_hold)} 檔 ·
+    <div class="meta">PROFILE ${esc(t.profile)} · 本金 ${esc(t.currency||'NT$')}${fmt(t.init)} · ${num(t.n_hold)} 檔 ·
       每 ${num(t.rebal_days)} 交易日換股${t.last_order? ' · 上次換股 '+esc(t.last_order) : ''}${nrText}</div>
   </section>`;
 }
@@ -199,6 +199,8 @@ function render(d, xs){
   html += trackCard(d.tracks.main);
   html += trackCard(d.tracks.sim);
   if(d.tracks.wf) html += trackCard(d.tracks.wf);
+  if(d.tracks.us1k) html += trackCard(d.tracks.us1k);
+  if(d.tracks.us10k) html += trackCard(d.tracks.us10k);
   html += xsCard(xs);
   document.getElementById('root').innerHTML = html;
 }
