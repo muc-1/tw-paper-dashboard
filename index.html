@@ -99,7 +99,7 @@
     animation:rise .35s var(--ease)}
   @keyframes rise{from{opacity:0;transform:translateY(8px)}}
   .dh{display:flex;align-items:baseline;gap:8px}
-  .dh .s{font-size:22px;font-weight:700;letter-spacing:-.2px}
+  .dh .s{font-size:22px;font-weight:700;letter-spacing:-.2px;white-space:nowrap;flex:none}
   .dh .n{font-size:15px;color:var(--label2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .dh .dd{margin-left:auto;font-size:12px;color:var(--label3);white-space:nowrap}
   .big{font-size:30px;font-weight:600;letter-spacing:-.4px;margin-top:6px;line-height:1.15}
@@ -135,6 +135,11 @@
   .mr .bar i{display:block;height:100%;border-radius:3px}
   .mr .v{text-align:right;font-weight:600}
   .fn{font-size:12px;color:var(--label3);line-height:1.6;margin:14px 0 10px}
+  .gh{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;font-weight:600;
+    color:var(--label2);margin:16px 0 2px;letter-spacing:.2px}
+  .gh span{font-weight:400;color:var(--label3);font-size:12px}
+  .gh:first-child{margin-top:6px}
+  .stale{color:var(--warn)}
 
   footer{margin-top:22px;text-align:center;font-size:12px;color:var(--label3);line-height:1.8}
   footer a{display:flex;justify-content:space-between;align-items:center;background:var(--card);border-radius:12px;
@@ -179,7 +184,7 @@ const cls = n => n>0 ? 'up' : n<0 ? 'dn' : 'fl';
 // 所有從 data.json / xs.json 來的字串塞進 innerHTML 前都要過這關(防 XSS)
 const esc = s => String(s==null?'':s).replace(/[&<>"']/g,
   c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const money = (v,cur,d=2) => cur==='USDT' ? `${fmt(v,d)} USDT` : `${esc(cur||'NT$')}${fmt(v,d)}`;
+const money = (v,cur,d=2) => cur==='USDT' ? `${fmt(v,d)} USDT` : `${esc(cur==null?'NT$':cur)}${fmt(v,d)}`;
 const md = s => s ? String(s).slice(5).replace('-','/') : '—';       // 2026-10-02 -> 10/02
 const MODES = ['當日漲跌','總報酬','當日金額'];
 
@@ -192,16 +197,30 @@ let ITEMS = [], showAll = false;
 // ── 資料整理 ────────────────────────────────────────────────────────
 function normTrack(k, t){
   const hist = (t.nav_hist||[]).filter(p=>p && p[1]!=null);
-  return {key:k, kind:'track', raw:t, sym:k.toUpperCase(),
+  return {key:k, kind:'track', group:'tw', raw:t, sym:k.toUpperCase(),
     name:String(t.label||k).replace(/^\S+\s*·\s*/,''), cur:t.currency||'NT$',
     nav:t.nav, day:t.day_ret, tot:t.total_ret, hist, disabled:!!t.disabled, date:t.data_date};
 }
 function normXS(x){
-  return {key:'xs', kind:'xs', raw:x, sym:'XS',
+  return {key:'xs', kind:'xs', group:'xs', raw:x, sym:'XS',
     name:String(x.label||'XS 午夜反轉').replace(/^XS\s*/,''), cur:'USDT',
     nav:x.equity, day:x.day_ret, tot:x.total_ret,
     hist:(x.equity_hist||[]).filter(p=>p && p[1]!=null), disabled:false, date:(x.updated||'').slice(0,10)};
 }
+// 外部專案(ext.json,由 paper_trading/ext_build.py 產生):TEXT4 的 Alpaca 帳戶、TEXT5 的 PBX
+const daysOld = s => { const t = Date.parse(String(s||'').slice(0,10)); return isNaN(t) ? Infinity : (Date.now()-t)/864e5; };
+function normAlpaca(a, src){
+  return {key:'a_'+a.id, kind:'alpaca', group:'alp', raw:a, sym:a.sym,
+    name:`${a.strategy} · ${a.cur}${a.init>=1000 ? fmt(a.init/1000)+'k' : fmt(a.init)}`, cur:a.cur||'US$',
+    nav:a.equity, day:a.day_ret, tot:a.total_ret, hist:a.hist||[], disabled:false,
+    date:src.source_time, stale:daysOld(src.source_time) > 3};
+}
+function normPBX(p){
+  return {key:'pbx', kind:'pbx', group:'pbx', raw:p, sym:'PBX', name:'拉回突破 · 台美股 138 檔', cur:'',
+    nav:p.equity, day:p.day_ret, tot:p.total_ret, hist:p.hist||[], disabled:false,
+    date:p.source_time, stale:daysOld(p.source_time) > 3};
+}
+const GROUPS = {tw:'動能軌道', xs:'加密', alp:'Alpaca 美股策略', pbx:'PBX 拉回突破'};
 const dayAmt = it => (it.nav!=null && it.day!=null) ? it.nav - it.nav/(1+it.day) : null;
 
 // ── 小走勢線(最近一個月,虛線 = 區間起點)────────────────────────────
@@ -228,7 +247,7 @@ function rowHTML(it){
   const b = badge(it), big = Math.abs(it.nav)>=100000;
   return `<div class="row${it.key===UI.sel?' sel':''}${it.disabled?' off':''}" role="button" tabindex="0"
       data-k="${esc(it.key)}" aria-pressed="${it.key===UI.sel}">
-    <div><div class="sym">${esc(it.sym)}</div><div class="nm">${esc(it.name)}</div></div>
+    <div><div class="sym">${esc(it.sym)}</div><div class="nm">${it.stale?'<span class="stale">資料過期 · </span>':''}${esc(it.name)}</div></div>
     <div>${spark(it.hist)}</div>
     <div class="r"><div class="p num">${fmt(it.nav, big?0:2)}</div>
       <button class="badge ${b.c} num" data-badge aria-label="${MODES[UI.mode]} ${esc(b.t)},點一下切換">${esc(b.t)}</button></div>
@@ -262,7 +281,9 @@ function rangeSlice(hist){
   return hist.slice(-Math.min(hist.length, r[2]));
 }
 function headChange(it){
-  return `<span class="${cls(it.day)}">${dayAmt(it)==null?'—':sgn(dayAmt(it))+fmt(Math.abs(dayAmt(it)),2)} (${pct(it.day)})</span><em>今天</em>`;
+  // Alpaca 的淨值是美股收盤後的值,標成那個交易日而不是「今天」
+  const when = it.kind==='alpaca' && it.hist.length ? `${md(it.hist[it.hist.length-1][0])} 收盤` : '今天';
+  return `<span class="${cls(it.day)}">${dayAmt(it)==null?'—':sgn(dayAmt(it))+fmt(Math.abs(dayAmt(it)),2)} (${pct(it.day)})</span><em>${when}</em>`;
 }
 
 function statsHTML(it){
@@ -274,6 +295,30 @@ function statsHTML(it){
     S.push(['部位', `${fmt(t.n_names)} 檔`]);
     S.push(['狀態', esc(t.kind||'—')]);
     S.push(['起始日', esc(t.inception||'—')]);
+  }else if(it.kind==='alpaca'){
+    const ps = t.positions||[], mv = ps.reduce((s,p)=>s+(p.mv||0),0), upl = ps.reduce((s,p)=>s+(p.upl||0),0);
+    S.push(['總報酬', `<span class="${cls(it.tot)}">${pct(it.tot)}</span>`]);
+    S.push(['當日', `<span class="${cls(it.day)}">${pct(it.day)}</span>`]);
+    S.push(['本金', money(t.init, it.cur, 0)]);
+    S.push(['現金', money(t.cash, it.cur, 0)]);
+    S.push(['持倉', `${fmt(ps.length)} 檔`]);
+    S.push(['曝險', it.nav ? `${(mv/it.nav*100).toFixed(0)}%` : '—']);
+    S.push(['未實現', `<span class="${cls(upl)}">${sgn(upl)}${money(Math.abs(upl), it.cur, 0)}</span>`]);
+    S.push(['出場規則', esc(t.exit_rule||'—')]);
+  }else if(it.kind==='pbx'){
+    const st = t.stats||{}, cv = t.coverage;
+    // TEXT5 交接文件:非假日卻「評估 0 檔」就是異常(曾經整整兩週一檔都沒評估)
+    const covTxt = !cv ? '—' : cv.evaluated===0
+      ? `<span class="dn">0/${fmt(cv.total)} 異常</span><small>${md(cv.date)}</small>`
+      : `${fmt(cv.evaluated)}/${fmt(cv.total)} 檔<small>${md(cv.date)}${cv.failed? ' · 失敗 '+fmt(cv.failed):''}</small>`;
+    S.push(['權益', fmt(t.equity, 0)]);
+    S.push(['總報酬', `<span class="${cls(it.tot)}">${pct(it.tot)}</span>`]);
+    S.push(['未平倉', `${fmt((t.open||[]).length)} 筆`]);
+    S.push(['已平倉', `${fmt(st.n_closed||0)} 筆`]);
+    S.push(['勝率', st.win_rate==null ? '—' : (st.win_rate*100).toFixed(0)+'%']);
+    S.push(['平均 R', st.avg_r==null ? '—' : `<span class="${cls(st.avg_r)}">${sgn(st.avg_r)}${Math.abs(st.avg_r).toFixed(2)}R</span>`]);
+    S.push(['累計 R', `<span class="${cls(st.total_r)}">${sgn(st.total_r)}${Math.abs(st.total_r||0).toFixed(2)}R</span>`]);
+    S.push(['今日評估', covTxt]);
   }else{
     const dr = t.drift||{}, nPos = (t.positions||[]).length;
     const nr = t.next_rebalance;
@@ -295,8 +340,41 @@ function statsHTML(it){
   return `<dl class="stats num">${S.map(([k,v])=>`<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>`;
 }
 
+const ORD_ST = {filled:'成交', partially_filled:'部分成交', accepted:'排隊中', new:'排隊中', pending_new:'排隊中',
+  canceled:'已取消', pending_cancel:'取消中', expired:'過期', rejected:'被拒'};
+const qtyFmt = q => q==null ? '—' : (Math.abs(q) >= 100 ? fmt(q,0) : Number(q).toFixed(Math.abs(q) >= 1 ? 2 : 4));
+
 function positionsHTML(it){
   const t = it.raw, LIMIT = 8;
+  if(it.kind==='alpaca'){
+    const ps = t.positions||[];
+    const rows = ps.map(p=>`<div class="pr"><div><b>${esc(p.sym)}</b>
+        <div class="nm num">${qtyFmt(p.qty)} 股 · 成本 ${fmt(p.avg,2)}${p.stop!=null? ' · 停損 '+fmt(p.stop,2):''}</div></div>
+      <div class="mid num">${money(p.mv, it.cur, 0)}</div>
+      <div class="rt num">${fmt(p.px,2)}<small class="${cls(p.upl_pct)}">${p.upl_pct==null?'—':sgn(p.upl_pct)+Math.abs(p.upl_pct).toFixed(1)+'%'}</small></div></div>`).join('');
+    const os = (t.orders||[]).map(o=>{
+      const buy = o.side==='buy', st = ORD_ST[o.status] || esc(o.status);
+      const what = o.price!=null && o.qty ? `${qtyFmt(o.qty)} @ ${fmt(o.price,2)}` : o.notional!=null ? money(o.notional, it.cur, 0) : '';
+      return `<div class="pr"><div><b>${esc(o.sym)}</b><span class="side ${buy?'l':'s'}">${buy?'買':'賣'}</span>
+          <div class="nm num">${esc(what)}</div></div>
+        <div class="mid num">${md(String(o.time||'').slice(0,10))}</div>
+        <div class="rt"><small class="${o.status==='filled'?'':'fl'}" style="font-size:13px">${st}</small></div></div>`;
+    }).join('');
+    return `<h3 class="sh">持倉<span>${fmt(ps.length)} 檔 · 依市值</span></h3>${rows||'<div class="empty">空手</div>'}
+      <h3 class="sh">最近委託<span>${fmt((t.orders||[]).length)} 筆</span></h3>${os||'<div class="empty">沒有委託</div>'}`;
+  }
+  if(it.kind==='pbx'){
+    const op = (t.open||[]).map(p=>`<div class="pr"><div><b>${esc(p.sym)}</b><span class="side ${p.side==='多'?'l':'s'}">${esc(p.side)}</span>
+        <div class="nm num">${md(p.entry_date)} 進場 ${fmt(p.entry,2)}${p.breakeven?' · 已保本':''}</div></div>
+      <div class="mid num">停損 ${fmt(p.stop,2)}</div><div class="rt num">${p.target==null?'—':fmt(p.target,2)}<small class="fl">目標</small></div></div>`).join('');
+    const cl = (t.closed||[]).map(c=>`<div class="pr"><div><b>${esc(c.sym)}</b><span class="side ${c.side==='多'?'l':'s'}">${esc(c.side)}</span>
+        <div class="nm num">${md(c.entry_date)} → ${md(c.exit_date)} · ${esc(c.reason||'')}</div></div>
+      <div class="mid"></div><div class="rt num"><span class="${cls(c.r)}">${c.r==null?'—':sgn(c.r)+Math.abs(c.r).toFixed(2)+'R'}</span></div></div>`).join('');
+    return `<h3 class="sh">未平倉<span>${fmt((t.open||[]).length)} 筆</span></h3>
+      ${op || '<div class="empty">目前沒有部位 · 等待 STANDARD 等級的突破訊號</div>'}
+      <h3 class="sh">已平倉<span>最近 ${fmt((t.closed||[]).length)} 筆</span></h3>
+      ${cl || '<div class="empty">尚無平倉紀錄</div>'}`;
+  }
   if(it.kind==='xs'){
     const ps = (t.positions||[]).slice().sort((a,b)=>Math.abs(b.notional)-Math.abs(a.notional));
     const show = showAll ? ps : ps.slice(0, LIMIT);
@@ -335,6 +413,10 @@ function detailHTML(it){
   if(!avail.some(r=>r[0]===UI.range)) UI.range = 'all';
   const foot = it.kind==='xs'
     ? `加密貨幣多空 · 每日 01:00 UTC 再平衡${t.note?' · '+esc(t.note):''}<br>更新 ${esc(t.updated||'—')}`
+    : it.kind==='alpaca'
+    ? `Alpaca 模擬帳戶(TEXT4)· 每天 05:30 對帳下單 · 日線收盤訊號<br>淨值為美股收盤後 · 資料時間 ${esc(it.date||'—')}`
+    : it.kind==='pbx'
+    ? `${esc(t.release||'')} · 只交易 STANDARD 等級 · 每天 06:00 評估(TEXT5)<br>10/05 起才實質開始;研究階段,統計上尚未顯著`
     : `PROFILE ${esc(t.profile)} · 每 ${fmt(t.rebal_days)} 交易日換股 · 資料日 ${esc(t.data_date||'—')}`;
   return `<section class="detail" aria-label="${esc(it.sym)} 明細">
     <div class="dh"><span class="s">${esc(it.sym)}</span><span class="n">${esc(it.name)}</span><span class="dd num">${md(it.date)}</span></div>
@@ -394,7 +476,11 @@ function drawChart(it){
 
 // ── 組裝 ────────────────────────────────────────────────────────────
 function renderList(){
-  document.getElementById('list').innerHTML = ITEMS.map(rowHTML).join('') || '<div class="empty">沒有資料</div>';
+  const groups = [...new Set(ITEMS.map(i=>i.group))];
+  document.getElementById('list').innerHTML = groups.map(g=>{
+    const its = ITEMS.filter(i=>i.group===g);
+    return `<div class="gh">${esc(GROUPS[g]||g)}<span>${its.length} 個</span></div><div class="grp">${its.map(rowHTML).join('')}</div>`;
+  }).join('') || '<div class="empty">沒有資料</div>';
   document.getElementById('modeBtn').textContent = MODES[UI.mode] + ' ⇅';
 }
 function renderDetail(animate){
@@ -406,9 +492,11 @@ function renderDetail(animate){
   if(!animate) box.firstElementChild.style.animation = 'none';
   drawChart(it);
 }
-function render(d, xs, offline){
+function render(d, xs, ext, offline){
   ITEMS = ['main','sim','wf','us1k','us10k'].filter(k=>d.tracks && d.tracks[k]).map(k=>normTrack(k, d.tracks[k]));
   if(xs && xs.equity!=null) ITEMS.push(normXS(xs));
+  if(ext && ext.alpaca) (ext.alpaca.accounts||[]).forEach(a=>ITEMS.push(normAlpaca(a, ext.alpaca)));
+  if(ext && ext.pbx && ext.pbx.equity!=null) ITEMS.push(normPBX(ext.pbx));
   const up = String(d.updated||'');
   const m = up.match(/^(\d{4})-(\d{2})-(\d{2})\s+(\d{2}:\d{2})/);
   const sub = document.getElementById('sub');
@@ -456,14 +544,15 @@ async function getJSON(u){
 }
 async function load(){
   const btn = document.getElementById('refresh'); btn.classList.add('spin');
-  const [d, xs] = await Promise.all([getJSON('./data.json'), getJSON('./xs.json')]);
+  const [d, xs, ext] = await Promise.all([getJSON('./data.json'), getJSON('./xs.json'), getJSON('./ext.json')]);
+  const cached = k => { try{ return JSON.parse(localStorage.getItem(k)); }catch(_){ return null; } };
   if(d){
-    render(d, xs, false);
-    try{ localStorage.setItem('pt_cache', JSON.stringify(d)); if(xs) localStorage.setItem('xs_cache', JSON.stringify(xs)); }catch(_){}
+    render(d, xs, ext, false);
+    try{ localStorage.setItem('pt_cache', JSON.stringify(d)); if(xs) localStorage.setItem('xs_cache', JSON.stringify(xs));
+         if(ext) localStorage.setItem('ext_cache', JSON.stringify(ext)); }catch(_){}
   }else{
-    const c  = (()=>{ try{ return JSON.parse(localStorage.getItem('pt_cache')); }catch(_){ return null; }})();
-    const cx = (()=>{ try{ return JSON.parse(localStorage.getItem('xs_cache')); }catch(_){ return null; }})();
-    if(c) render(c, xs||cx, true);
+    const c = cached('pt_cache');
+    if(c) render(c, xs||cached('xs_cache'), ext||cached('ext_cache'), true);
     else document.getElementById('list').innerHTML = '<div class="empty">讀取失敗,稍後再試</div>';
   }
   btn.classList.remove('spin');

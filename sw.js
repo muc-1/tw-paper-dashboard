@@ -4,7 +4,7 @@
 // 只有真正靜態的(manifest / icon)才「先快取」。
 const SHELL = 'pt-shell-v5';
 const STATIC = ['./manifest.json', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
-const NET_FIRST = ['/', '/index.html', '/data.json', '/xs.json', '/report.html'];
+const NET_FIRST = ['/', '/index.html', '/data.json', '/xs.json', '/ext.json', '/report.html'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(SHELL).then(c => c.addAll(STATIC)).then(() => self.skipWaiting()));
