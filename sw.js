@@ -2,8 +2,8 @@
 // 會變的東西(index.html / *.json / report.html)一律「先網路、失敗才快取」,
 // 這樣改版後重新整理一定拿得到新版,不會卡舊快取。
 // 只有真正靜態的(manifest / icon)才「先快取」。
-const SHELL = 'pt-shell-v4';
-const STATIC = ['./manifest.json', './icon-192.png', './icon-512.png'];
+const SHELL = 'pt-shell-v5';
+const STATIC = ['./manifest.json', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 const NET_FIRST = ['/', '/index.html', '/data.json', '/xs.json', '/report.html'];
 
 self.addEventListener('install', e => {
