@@ -11,7 +11,7 @@ table{border-collapse:collapse;width:100%;background:#fffdf7;font-size:.83rem;bo
 th,td{padding:5px 9px;border-bottom:1px solid #eee3cf;text-align:left}
 th{background:#fbf7ee;font-size:.68rem;text-transform:uppercase;color:#8a8173}
 td.n{font-family:"IBM Plex Mono",monospace;text-align:right}
-pre{background:#fffdf7;border-left:3px solid #c0392b;padding:8px 14px;white-space:pre-wrap;font-size:.8rem}
+pre{background:#fffdf7;border-left:3px solid #2f7d5d;padding:8px 14px;white-space:pre-wrap;font-size:.8rem}
 </style>
 <h1>紙上交易日報 · 2026-10-22</h1>
 <h2>實盤時間演練(永豐模擬 + 盤中零股)</h2><pre>實盤時間演練 2026-10-22(限價 = 昨收 ±10%)
@@ -24,17 +24,18 @@ pre{background:#fffdf7;border-left:3px solid #c0392b;padding:8px 14px;white-spac
    預定 09:30  實際 09:30:00    查委託狀態  OrderStatus.Filled×23 OrderStatus.Failed×23
    預定 —      實際 09:30:00    演練結束  
    預定 15:2x  實際 15:27:59    收盤後比對  wf 少付 NT$575
+   預定 15:2x  實際 17:25:00    收盤後比對  wf 少付 NT$575
    【wf】實盤比紙上少付 NT$575,成交額的 -0.21%(46/46 筆在限價內)
-      6672 買     28 股  紙上   665.66  實盤   631.00  多付    -971  永豐模擬 零股:OrderStatus.Filled
-      6669 買     14 股  紙上  1941.94  實盤  1905.00  多付    -517  永豐模擬 零股:OrderStatus.Filled
-      6213 賣     11 股  紙上   862.14  實盤   828.00  多付    +376  永豐模擬 零股:OrderStatus.Failed
-      3441 賣     40 股  紙上   245.75  實盤   237.00  多付    +350  永豐模擬 零股:OrderStatus.Failed
-      6715 買     43 股  紙上   494.99  實盤   502.00  多付    +301  永豐模擬 零股:OrderStatus.Filled
-      2221 賣    210 股  紙上   131.37  實盤   132.50  多付    -238  永豐模擬 零股:OrderStatus.Failed
-      2030 買    185 股  紙上    28.98  實盤    30.20  多付    +226  永豐模擬 零股:OrderStatus.Filled
-      3229 賣    112 股  紙上    53.95  實盤    52.40  多付    +173  永豐模擬 零股:OrderStatus.Failed
-      3189 賣      9 股  紙上  1023.98  實盤  1040.00  多付    -144  永豐模擬 零股:OrderStatus.Failed
-      3037 賣     22 股  紙上  1158.84  實盤  1165.00  多付    -136  永豐模擬 零股:OrderStatus.Failed
+      6672 買     28 股  紙上   665.66  實盤   631.00  多付    -971  永豐模擬 零股:成交
+      6669 買     14 股  紙上  1941.94  實盤  1905.00  多付    -517  永豐模擬 零股:成交
+      6213 賣     11 股  紙上   862.14  實盤   828.00  多付    +376  永豐模擬 零股:被拒
+      3441 賣     40 股  紙上   245.75  實盤   237.00  多付    +350  永豐模擬 零股:被拒
+      6715 買     43 股  紙上   494.99  實盤   502.00  多付    +301  永豐模擬 零股:成交
+      2221 賣    210 股  紙上   131.37  實盤   132.50  多付    -238  永豐模擬 零股:被拒
+      2030 買    185 股  紙上    28.98  實盤    30.20  多付    +226  永豐模擬 零股:成交
+      3229 賣    112 股  紙上    53.95  實盤    52.40  多付    +173  永豐模擬 零股:被拒
+      3189 賣      9 股  紙上  1023.98  實盤  1040.00  多付    -144  永豐模擬 零股:被拒
+      3037 賣     22 股  紙上  1158.84  實盤  1165.00  多付    -136  永豐模擬 零股:被拒
       …其餘 36 筆見 logs/rehearsal.csv</pre>
 <h2>main 軌道(lite10k 零股) <small style="color:#8a8173">· 資料日 2026-10-22</small></h2>
 <div class=k>
@@ -102,8 +103,8 @@ pre{background:#fffdf7;border-left:3px solid #c0392b;padding:8px 14px;white-spac
 <table><tr><th>代號</th><th>買賣</th><th>股數</th><th>價</th></tr><tr><td colspan=4>（今日無成交）</td></tr></table>
 
 <p style="color:#9a9080;font-size:.8rem">PROFILE=us10k · 資金 US$10,000 · 5 檔 · 每 21 交易日換股</p>
-<h2>系統健康</h2><pre>紙上交易健康檢查 · 2026-10-22 15:27
-總結:有異常 ✗
+<h2>系統健康</h2><pre>紙上交易健康檢查 · 2026-10-22 17:25
+總結:全部正常 ✔
 
   [OK  ] 面板資料(台股) — 最後 2026-10-22,落後約 0 個平日
   [OK  ] 面板資料(美股) — 最後 2026-10-21,落後約 1 個平日
@@ -113,7 +114,7 @@ pre{background:#fffdf7;border-left:3px solid #c0392b;padding:8px 14px;white-spac
   [OK  ] us1k 軌道(美股) — nav.csv 最後 2026-10-21
   [OK  ] us10k 軌道(美股) — nav.csv 最後 2026-10-21
   [OK  ] 持股公司行動 — 正常
-  [FAIL] cron.log 錯誤 — 7 條:預定 09:30  實際 09:30:00    查委託狀態  OrderStatus.Filled×23 OrderStatus.Failed×23 / 6213 賣     11 股  紙上   862.14  實盤   828.00  多付    +376  永豐模擬 零股:OrderStatus.Failed / 3441 賣     40 股  紙上   245.75  實盤   237.00  多付    +350  永豐模擬 零股:OrderStatus.Failed
+  [OK  ] cron.log 錯誤 — 無
   [OK  ] sim 對帳 — paper 模式(未接券商),不需對帳
 </pre>
 <p style="color:#9a9080;font-size:.8rem;border-top:1px solid #e2dac8;padding-top:1em">自動產生,非投資建議。</p>

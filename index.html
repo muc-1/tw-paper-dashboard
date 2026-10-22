@@ -165,7 +165,7 @@
     <div class="sub" id="sub">載入中…</div>
   </header>
   <div id="healthBox"></div>
-  <div class="lh"><h2>軌道</h2><button id="modeBtn" aria-label="切換右側數字">當日漲跌</button></div>
+  <div class="lh"><h2>軌道</h2><span><button id="rngBtn" aria-label="切換走勢圖區間(跟明細圖同步)">走勢 全部</button><button id="modeBtn" aria-label="切換右側數字">當日漲跌</button></span></div>
   <div id="list"><div class="sk"></div><div class="sk"></div><div class="sk"></div></div>
   <div id="detail"></div>
   <footer>
@@ -223,9 +223,9 @@ function normPBX(p){
 const GROUPS = {tw:'動能軌道', xs:'加密', alp:'Alpaca 美股策略', pbx:'PBX 拉回突破'};
 const dayAmt = it => (it.nav!=null && it.day!=null) ? it.nav - it.nav/(1+it.day) : null;
 
-// ── 小走勢線(最近一個月,虛線 = 區間起點)────────────────────────────
+// ── 小走勢線(跟明細圖同一個區間,虛線 = 區間起點)──────────────────────
 function spark(hist){
-  const v = hist.slice(-22).map(p=>p[1]);
+  const v = rangeSlice(hist).map(p=>p[1]);
   if(v.length<2) return '<svg></svg>';
   const W=62,H=30,lo=Math.min(...v),hi=Math.max(...v),sp=(hi-lo)||1;
   const y = x => (H-2-(x-lo)/sp*(H-4)).toFixed(1);
@@ -275,10 +275,22 @@ function healthHTML(h){
 }
 
 // ── 明細:大數字 + 區間圖(可滑動查看)+ 統計 + 持股 + 逐月 ────────────────
-const RANGES = [['1w','1週',6],['1m','1月',22],['3m','3月',64],['all','全部',Infinity]];
-function rangeSlice(hist){
+// 區間用「日曆天」算,不用點數:台股一週 5 個點、加密貨幣一週 7 個點,用點數切會變成不同長度的時間。
+// 起點取「區間開始那天或之前最後一個點」,所以 1 週 = 跟上週同一天收盤比。
+const RANGES = [['1w','1週',7],['1m','1月',30],['3m','3月',91],['all','全部',Infinity]];
+const dayNo = s => Math.floor(Date.parse(String(s).slice(0,10))/864e5);
+const rangeOK = (hist, r) => r[2]===Infinity || (hist.length>1 && dayNo(hist[0][0]) < dayNo(hist[hist.length-1][0]) - r[2]);
+function rangeOf(hist){                       // 這條歷史不夠長就退回「全部」(不改使用者選的區間)
   const r = RANGES.find(r=>r[0]===UI.range) || RANGES[3];
-  return hist.slice(-Math.min(hist.length, r[2]));
+  return rangeOK(hist, r) ? r : RANGES[3];
+}
+function rangeSlice(hist){
+  const r = rangeOf(hist);
+  if(r[2]===Infinity || hist.length<2) return hist;
+  const cut = dayNo(hist[hist.length-1][0]) - r[2];
+  let i = 0;
+  while(i+1 < hist.length && dayNo(hist[i+1][0]) <= cut) i++;
+  return hist.slice(i);
 }
 function headChange(it){
   // Alpaca 的淨值是美股收盤後的值,標成那個交易日而不是「今天」
@@ -409,8 +421,7 @@ function monthlyHTML(it){
 
 function detailHTML(it){
   const t = it.raw;
-  const avail = RANGES.filter(r=>r[2]===Infinity || r[2] < it.hist.length);
-  if(!avail.some(r=>r[0]===UI.range)) UI.range = 'all';
+  const avail = RANGES.filter(r=>rangeOK(it.hist, r)), cur = rangeOf(it.hist)[0];
   const foot = it.kind==='xs'
     ? `加密貨幣多空 · 每日 01:00 UTC 再平衡${t.note?' · '+esc(t.note):''}<br>更新 ${esc(t.updated||'—')}`
     : it.kind==='alpaca'
@@ -423,7 +434,7 @@ function detailHTML(it){
     <div class="big num" id="bigv">${money(it.nav, it.cur, 2)}</div>
     <div class="chg num" id="chg">${headChange(it)}</div>
     <div class="seg" role="tablist">${avail.map(r=>
-      `<button role="tab" data-range="${r[0]}" aria-selected="${r[0]===UI.range}">${r[1]}</button>`).join('')}</div>
+      `<button role="tab" data-range="${r[0]}" aria-selected="${r[0]===cur}">${r[1]}</button>`).join('')}</div>
     <div class="chart" id="chart"></div>
     <div class="xa num" id="xa"></div>
     ${statsHTML(it)}
@@ -482,6 +493,7 @@ function renderList(){
     return `<div class="gh">${esc(GROUPS[g]||g)}<span>${its.length} 個</span></div><div class="grp">${its.map(rowHTML).join('')}</div>`;
   }).join('') || '<div class="empty">沒有資料</div>';
   document.getElementById('modeBtn').textContent = MODES[UI.mode] + ' ⇅';
+  document.getElementById('rngBtn').textContent = '走勢 ' + (RANGES.find(r=>r[0]===UI.range) || RANGES[3])[1];
 }
 function renderDetail(animate){
   const it = ITEMS.find(i=>i.key===UI.sel && !i.disabled) || ITEMS.find(i=>!i.disabled);
@@ -517,7 +529,10 @@ document.addEventListener('click', e => {
   const rg = e.target.closest('[data-range]');
   if(rg){ UI.range = rg.dataset.range; saveUI();
     document.querySelectorAll('[data-range]').forEach(x=>x.setAttribute('aria-selected', x===rg));
-    drawChart(ITEMS.find(i=>i.key===UI.sel)); return; }
+    renderList(); drawChart(ITEMS.find(i=>i.key===UI.sel)); return; }      // 清單小圖跟著換區間
+  if(e.target.closest('#rngBtn')){
+    const i = RANGES.findIndex(r=>r[0]===UI.range);
+    UI.range = RANGES[(i+1) % RANGES.length][0]; saveUI(); renderList(); renderDetail(false); return; }
   if(e.target.closest('#more')){ showAll = !showAll; renderDetail(false); return; }
   if(e.target.closest('#hbtn')){ UI.hOpen = document.getElementById('hbtn').getAttribute('aria-expanded')!=='true'; saveUI();
     const hb = document.getElementById('hbtn'); hb.setAttribute('aria-expanded', UI.hOpen);
