@@ -1,4 +1,4 @@
-<!doctype html><meta charset=utf-8><title>日報 2026-10-22</title>
+<!doctype html><meta charset=utf-8><title>日報 2026-10-23</title>
 <style>
 body{font-family:"IBM Plex Sans","Microsoft JhengHei",sans-serif;max-width:820px;margin:20px auto;padding:0 16px;color:#39342c;background:#f6f3ec;line-height:1.6}
 h1{font-family:Georgia,"Noto Serif TC",serif;font-weight:500;font-size:1.5rem;color:#201d1a}
@@ -13,30 +13,8 @@ th{background:#fbf7ee;font-size:.68rem;text-transform:uppercase;color:#8a8173}
 td.n{font-family:"IBM Plex Mono",monospace;text-align:right}
 pre{background:#fffdf7;border-left:3px solid #2f7d5d;padding:8px 14px;white-space:pre-wrap;font-size:.8rem}
 </style>
-<h1>紙上交易日報 · 2026-10-22</h1>
-<h2>實盤時間演練(永豐模擬 + 盤中零股)</h2><pre>實盤時間演練 2026-10-22(限價 = 昨收 ±10%)
-   預定 前一天收盤後 實際 10-21 17:27 通知:算出明天的單、寄信  wf 46 筆
-   預定 08:45  實際 08:45:01    演練開始  wf
-   預定 08:45  實際 08:45:02    登入永豐模擬環境  1.19 秒
-   預定 09:00  實際 09:00:27    送零股單  永豐模擬:46/46 筆送出沒有錯誤
-   預定 09:00  實際 09:02:16    開盤撮合  整股開盤價 46/46 檔
-   預定 09:10  實際 09:13:57    零股第一次撮合  盤中零股撮合價 46/46 檔
-   預定 09:30  實際 09:30:00    查委託狀態  OrderStatus.Filled×23 OrderStatus.Failed×23
-   預定 —      實際 09:30:00    演練結束  
-   預定 15:2x  實際 15:27:59    收盤後比對  wf 少付 NT$575
-   預定 15:2x  實際 17:25:00    收盤後比對  wf 少付 NT$575
-   【wf】實盤比紙上少付 NT$575,成交額的 -0.21%(46/46 筆在限價內)
-      6672 買     28 股  紙上   665.66  實盤   631.00  多付    -971  永豐模擬 零股:成交
-      6669 買     14 股  紙上  1941.94  實盤  1905.00  多付    -517  永豐模擬 零股:成交
-      6213 賣     11 股  紙上   862.14  實盤   828.00  多付    +376  永豐模擬 零股:被拒
-      3441 賣     40 股  紙上   245.75  實盤   237.00  多付    +350  永豐模擬 零股:被拒
-      6715 買     43 股  紙上   494.99  實盤   502.00  多付    +301  永豐模擬 零股:成交
-      2221 賣    210 股  紙上   131.37  實盤   132.50  多付    -238  永豐模擬 零股:被拒
-      2030 買    185 股  紙上    28.98  實盤    30.20  多付    +226  永豐模擬 零股:成交
-      3229 賣    112 股  紙上    53.95  實盤    52.40  多付    +173  永豐模擬 零股:被拒
-      3189 賣      9 股  紙上  1023.98  實盤  1040.00  多付    -144  永豐模擬 零股:被拒
-      3037 賣     22 股  紙上  1158.84  實盤  1165.00  多付    -136  永豐模擬 零股:被拒
-      …其餘 36 筆見 logs/rehearsal.csv</pre>
+<h1>紙上交易日報 · 2026-10-23</h1>
+
 <h2>main 軌道(lite10k 零股) <small style="color:#8a8173">· 資料日 2026-10-22</small></h2>
 <div class=k>
  <div><small>NAV NT$</small><b>12,510</b></div>
@@ -76,43 +54,43 @@ pre{background:#fffdf7;border-left:3px solid #2f7d5d;padding:8px 14px;white-spac
 <p style="margin:.6em 0 .2em"><b>今日成交</b></p>
 <table><tr><th>代號</th><th>買賣</th><th>股數</th><th>價</th></tr><tr><td>1303</td><td>sell</td><td class=n>1</td><td class=n>323.676</td></tr><tr><td>2408</td><td>sell</td><td class=n>1</td><td class=n>442.0575</td></tr><tr><td>2466</td><td>sell</td><td class=n>6</td><td class=n>260.739</td></tr><tr><td>3441</td><td>sell</td><td class=n>40</td><td class=n>245.754</td></tr><tr><td>3605</td><td>sell</td><td class=n>4</td><td class=n>183.3165</td></tr><tr><td>4707</td><td>sell</td><td class=n>154</td><td class=n>29.8701</td></tr><tr><td>6213</td><td>sell</td><td class=n>11</td><td class=n>862.137</td></tr><tr><td>8039</td><td>sell</td><td class=n>19</td><td class=n>298.701</td></tr><tr><td>8046</td><td>sell</td><td class=n>2</td><td class=n>1368.63</td></tr><tr><td>2426</td><td>sell</td><td class=n>16</td><td class=n>92.8071</td></tr><tr><td>3026</td><td>sell</td><td class=n>6</td><td class=n>831.168</td></tr><tr><td>3037</td><td>sell</td><td class=n>22</td><td class=n>1158.84</td></tr><tr><td>3189</td><td>sell</td><td class=n>9</td><td class=n>1023.975</td></tr><tr><td>6173</td><td>sell</td><td class=n>31</td><td class=n>311.688</td></tr><tr><td>6182</td><td>sell</td><td class=n>4</td><td class=n>112.887</td></tr><tr><td>3055</td><td>sell</td><td class=n>6</td><td class=n>152.847</td></tr><tr><td>3374</td><td>sell</td><td class=n>1</td><td class=n>488.511</td></tr><tr><td>3498</td><td>sell</td><td class=n>6</td><td class=n>247.752</td></tr><tr><td>2302</td><td>sell</td><td class=n>15</td><td class=n>46.5534</td></tr><tr><td>2303</td><td>sell</td><td class=n>40</td><td class=n>128.871</td></tr><tr><td>2454</td><td>sell</td><td class=n>2</td><td class=n>4225.77</td></tr><tr><td>2464</td><td>sell</td><td class=n>30</td><td class=n>172.827</td></tr><tr><td>2492</td><td>sell</td><td class=n>2</td><td class=n>414.585</td></tr><tr><td>4939</td><td>sell</td><td class=n>75</td><td class=n>78.3216</td></tr><tr><td>3229</td><td>sell</td><td class=n>112</td><td class=n>53.946</td></tr><tr><td>2221</td><td>sell</td><td class=n>210</td><td class=n>131.3685</td></tr><tr><td>6226</td><td>buy</td><td class=n>1</td><td class=n>41.4915</td></tr><tr><td>1709</td><td>buy</td><td class=n>23</td><td class=n>56.4564</td></tr><tr><td>2030</td><td>buy</td><td class=n>185</td><td class=n>28.9789</td></tr><tr><td>2305</td><td>buy</td><td class=n>3</td><td class=n>57.057</td></tr><tr><td>2395</td><td>buy</td><td class=n>8</td><td class=n>685.685</td></tr><tr><td>2409</td><td>buy</td><td class=n>142</td><td class=n>37.7877</td></tr><tr><td>3094</td><td>buy</td><td class=n>4</td><td class=n>56.9569</td></tr><tr><td>3481</td><td>buy</td><td class=n>109</td><td class=n>49.049</td></tr><tr><td>3532</td><td>buy</td><td class=n>1</td><td class=n>433.9335</td></tr><tr><td>5328</td><td>buy</td><td class=n>100</td><td class=n>53.7537</td></tr><tr><td>6207</td><td>buy</td><td class=n>39</td><td class=n>142.142</td></tr><tr><td>6446</td><td>buy</td><td class=n>5</td><td class=n>1196.195</td></tr><tr><td>6505</td><td>buy</td><td class=n>48</td><td class=n>112.112</td></tr><tr><td>6617</td><td>buy</td><td class=n>46</td><td class=n>116.116</td></tr><tr><td>6669</td><td>buy</td><td class=n>14</td><td class=n>1941.94</td></tr><tr><td>6672</td><td>buy</td><td class=n>28</td><td class=n>665.665</td></tr><tr><td>6834</td><td>buy</td><td class=n>4</td><td class=n>141.141</td></tr><tr><td>6933</td><td>buy</td><td class=n>14</td><td class=n>399.399</td></tr><tr><td>6715</td><td>buy</td><td class=n>43</td><td class=n>494.9945</td></tr><tr><td>8227</td><td>buy</td><td class=n>19</td><td class=n>287.287</td></tr></table>
 
-<p style="color:#9a9080;font-size:.8rem">PROFILE=wf_full · 資金 NT$1,000,000 · 目前 54 檔(混合,檔數不固定) · 每 5 交易日換股</p><h2>US1K 軌道(美股 $1,000) <small style="color:#8a8173">· 資料日 2026-10-21</small></h2>
+<p style="color:#9a9080;font-size:.8rem">PROFILE=wf_full · 資金 NT$1,000,000 · 目前 54 檔(混合,檔數不固定) · 每 5 交易日換股</p><h2>US1K 軌道(美股 $1,000) <small style="color:#8a8173">· 資料日 2026-10-22</small></h2>
 <div class=k>
- <div><small>NAV US$</small><b>1,233</b></div>
- <div><small>當日</small><b>+2.43%</b></div>
- <div><small>總報酬</small><b>+23.3%</b></div>
+ <div><small>NAV US$</small><b>1,217</b></div>
+ <div><small>當日</small><b>-1.33%</b></div>
+ <div><small>總報酬</small><b>+21.7%</b></div>
  <div><small>Regime</small><b>ON</b></div>
  <div><small>現金</small><b>26</b></div>
 </div>
-<table><tr><th>代號</th><th>名稱</th><th>股數</th><th>成本</th><th>現價</th><th>未實現</th><th>市值</th></tr><tr><td>HPE</td><td>Hewlett Packard Enterprise</td><td class=n>7</td><td class=n>53.17</td><td class=n>58.17</td><td class=n>+9.4%</td><td class=n>407</td></tr><tr><td>P</td><td>Everpure</td><td class=n>3</td><td class=n>132.13</td><td class=n>130.93</td><td class=n>-0.9%</td><td class=n>393</td></tr><tr><td>HPQ</td><td>HP Inc.</td><td class=n>13</td><td class=n>31.09</td><td class=n>31.32</td><td class=n>+0.7%</td><td class=n>407</td></tr></table>
+<table><tr><th>代號</th><th>名稱</th><th>股數</th><th>成本</th><th>現價</th><th>未實現</th><th>市值</th></tr><tr><td>HPE</td><td>Hewlett Packard Enterprise</td><td class=n>7</td><td class=n>53.17</td><td class=n>55.47</td><td class=n>+4.3%</td><td class=n>388</td></tr><tr><td>P</td><td>Everpure</td><td class=n>3</td><td class=n>132.13</td><td class=n>121.20</td><td class=n>-8.3%</td><td class=n>364</td></tr><tr><td>HPQ</td><td>HP Inc.</td><td class=n>13</td><td class=n>31.09</td><td class=n>33.76</td><td class=n>+8.6%</td><td class=n>439</td></tr></table>
 
 <p style="margin:.6em 0 .2em"><b>今日成交</b></p>
 <table><tr><th>代號</th><th>買賣</th><th>股數</th><th>價</th></tr><tr><td colspan=4>（今日無成交）</td></tr></table>
 
-<p style="color:#9a9080;font-size:.8rem">PROFILE=us1k · 資金 US$1,000 · 3 檔 · 每 21 交易日換股</p><h2>US10K 軌道(美股 $10,000) <small style="color:#8a8173">· 資料日 2026-10-21</small></h2>
+<p style="color:#9a9080;font-size:.8rem">PROFILE=us1k · 資金 US$1,000 · 3 檔 · 每 21 交易日換股</p><h2>US10K 軌道(美股 $10,000) <small style="color:#8a8173">· 資料日 2026-10-22</small></h2>
 <div class=k>
- <div><small>NAV US$</small><b>12,506</b></div>
- <div><small>當日</small><b>+2.81%</b></div>
- <div><small>總報酬</small><b>+25.1%</b></div>
+ <div><small>NAV US$</small><b>11,938</b></div>
+ <div><small>當日</small><b>-4.54%</b></div>
+ <div><small>總報酬</small><b>+19.4%</b></div>
  <div><small>Regime</small><b>ON</b></div>
  <div><small>現金</small><b>155</b></div>
 </div>
-<table><tr><th>代號</th><th>名稱</th><th>股數</th><th>成本</th><th>現價</th><th>未實現</th><th>市值</th></tr><tr><td>HPE</td><td>Hewlett Packard Enterprise</td><td class=n>44</td><td class=n>57.71</td><td class=n>58.17</td><td class=n>+0.8%</td><td class=n>2,559</td></tr><tr><td>PANW</td><td>Palo Alto Networks</td><td class=n>7</td><td class=n>374.84</td><td class=n>347.25</td><td class=n>-7.4%</td><td class=n>2,431</td></tr><tr><td>MRNA</td><td>Moderna</td><td class=n>11</td><td class=n>152.65</td><td class=n>245.81</td><td class=n>+61.0%</td><td class=n>2,704</td></tr><tr><td>CRWD</td><td>CrowdStrike</td><td class=n>10</td><td class=n>237.37</td><td class=n>239.34</td><td class=n>+0.8%</td><td class=n>2,393</td></tr><tr><td>FTNT</td><td>Fortinet</td><td class=n>13</td><td class=n>182.53</td><td class=n>174.05</td><td class=n>-4.6%</td><td class=n>2,263</td></tr></table>
+<table><tr><th>代號</th><th>名稱</th><th>股數</th><th>成本</th><th>現價</th><th>未實現</th><th>市值</th></tr><tr><td>HPE</td><td>Hewlett Packard Enterprise</td><td class=n>44</td><td class=n>57.71</td><td class=n>55.47</td><td class=n>-3.9%</td><td class=n>2,441</td></tr><tr><td>PANW</td><td>Palo Alto Networks</td><td class=n>7</td><td class=n>374.84</td><td class=n>354.92</td><td class=n>-5.3%</td><td class=n>2,484</td></tr><tr><td>MRNA</td><td>Moderna</td><td class=n>11</td><td class=n>152.65</td><td class=n>202.63</td><td class=n>+32.7%</td><td class=n>2,229</td></tr><tr><td>CRWD</td><td>CrowdStrike</td><td class=n>10</td><td class=n>237.37</td><td class=n>237.94</td><td class=n>+0.2%</td><td class=n>2,379</td></tr><tr><td>FTNT</td><td>Fortinet</td><td class=n>13</td><td class=n>182.53</td><td class=n>172.98</td><td class=n>-5.2%</td><td class=n>2,249</td></tr></table>
 
 <p style="margin:.6em 0 .2em"><b>今日成交</b></p>
 <table><tr><th>代號</th><th>買賣</th><th>股數</th><th>價</th></tr><tr><td colspan=4>（今日無成交）</td></tr></table>
 
 <p style="color:#9a9080;font-size:.8rem">PROFILE=us10k · 資金 US$10,000 · 5 檔 · 每 21 交易日換股</p>
-<h2>系統健康</h2><pre>紙上交易健康檢查 · 2026-10-22 17:25
+<h2>系統健康</h2><pre>紙上交易健康檢查 · 2026-10-23 15:25
 總結:全部正常 ✔
 
-  [OK  ] 面板資料(台股) — 最後 2026-10-22,落後約 0 個平日
-  [OK  ] 面板資料(美股) — 最後 2026-10-21,落後約 1 個平日
+  [OK  ] 面板資料(台股) — 最後 2026-10-22,落後約 1 個平日
+  [OK  ] 面板資料(美股) — 最後 2026-10-22,落後約 1 個平日
   [OK  ] main 軌道(lite10k) — nav.csv 最後 2026-10-22
   [OK  ] sim 軌道 — nav.csv 最後 2026-10-22
   [OK  ] wf 軌道(驗證版動能) — nav.csv 最後 2026-10-22
-  [OK  ] us1k 軌道(美股) — nav.csv 最後 2026-10-21
-  [OK  ] us10k 軌道(美股) — nav.csv 最後 2026-10-21
+  [OK  ] us1k 軌道(美股) — nav.csv 最後 2026-10-22
+  [OK  ] us10k 軌道(美股) — nav.csv 最後 2026-10-22
   [OK  ] 持股公司行動 — 正常
   [OK  ] cron.log 錯誤 — 無
   [OK  ] sim 對帳 — paper 模式(未接券商),不需對帳
