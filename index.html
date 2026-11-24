@@ -228,8 +228,24 @@ function normT6(t, src, us){
     nav:t.equity, day:t.day_ret, tot:t.total_ret, hist:t.hist||[], disabled:false,
     date:src.source_time, stale:us ? daysOld(src.heartbeat) > 2 : daysOld(src.source_time) > 4, src};
 }
-const GROUPS = {tw:'動能軌道', xs:'加密', alp:'Alpaca 美股策略', pbx:'PBX 拉回突破', t6:'三條件動能', t6us:'三條件動能 · 美股'};
-const dayAmt = it => (it.nav!=null && it.day!=null) ? it.nav - it.nav/(1+it.day) : null;
+// main 真錢(data.json 的 live,dash_build.py._live):公開頁面只有百分比,淨值換成「起始 = 100」的指數
+function normLive(l){
+  const hist = (l.idx_hist||[]).filter(p=>p && p[1]!=null);
+  return {key:'live', kind:'live', group:'live', raw:l, sym:'LIVE', name:'main 零股 · 永豐真錢', cur:'',
+    nav:hist.length ? hist[hist.length-1][1] : 100, day:l.day_ret, tot:l.total_ret, hist,
+    disabled:false, date:l.data_date, stale:daysOld(l.data_date) > 4};
+}
+// TEXT6 Capital(Claude 代理人公司)的專屬模擬帳戶:台股、美股各一個;美股日期是美東交易日
+function normCo(a, src){
+  const us = a.market==='US';
+  return {key:'co_'+String(a.market).toLowerCase(), kind:'co', group:'co', raw:a, us, src,
+    sym:'CAP '+a.market, name:`代理人公司 · ${us ? 'US$'+fmt(a.init/1000)+'k' : fmt(a.init/1e4)+' 萬'}`, cur:us?'US$':'NT$',
+    nav:a.equity, day:a.day_ret, tot:a.total_ret, hist:(a.hist||[]).filter(p=>p && p[1]!=null), disabled:false,
+    date:a.last_day, stale:daysOld(a.last_day) > 4};
+}
+const GROUPS = {tw:'動能軌道', live:'真錢交易', xs:'加密', alp:'Alpaca 美股策略', pbx:'PBX 拉回突破', t6:'三條件動能', t6us:'三條件動能 · 美股',
+  co:'TEXT6 Capital 公司'};
+const dayAmt = it => (it.kind!=='live' && it.nav!=null && it.day!=null) ? it.nav - it.nav/(1+it.day) : null;
 
 // ── 小走勢線(跟明細圖同一個區間,虛線 = 區間起點)──────────────────────
 function spark(hist){
@@ -302,7 +318,8 @@ function rangeSlice(hist){
 }
 function headChange(it){
   // Alpaca 的淨值是美股收盤後的值,標成那個交易日而不是「今天」
-  const when = it.kind==='alpaca' && it.hist.length ? `${md(it.hist[it.hist.length-1][0])} 收盤` : '今天';
+  const when = (it.kind==='alpaca' || (it.kind==='co' && it.us)) && it.hist.length ? `${md(it.hist[it.hist.length-1][0])} 收盤` : '今天';
+  if(it.kind==='live') return `<span class="${cls(it.day)}">${pct(it.day)}</span><em>${when} · 指數起始 100</em>`;
   return `<span class="${cls(it.day)}">${dayAmt(it)==null?'—':sgn(dayAmt(it))+fmt(Math.abs(dayAmt(it)),2)} (${pct(it.day)})</span><em>${when}</em>`;
 }
 
@@ -339,6 +356,16 @@ function statsHTML(it){
     S.push(['平均 R', st.avg_r==null ? '—' : `<span class="${cls(st.avg_r)}">${sgn(st.avg_r)}${Math.abs(st.avg_r).toFixed(2)}R</span>`]);
     S.push(['累計 R', `<span class="${cls(st.total_r)}">${sgn(st.total_r)}${Math.abs(st.total_r||0).toFixed(2)}R</span>`]);
     S.push(['今日評估', covTxt]);
+  }else if(it.kind==='live'){
+    const lr = t.last_run;
+    S.push(['總報酬', `<span class="${cls(it.tot)}">${pct(it.tot)}</span>`]);
+    S.push(['當日', `<span class="${cls(it.day)}">${pct(it.day)}</span>`]);
+    S.push(['紙上 main 同期', `<span class="${cls(t.paper_ret)}">${pct(t.paper_ret)}</span>`]);
+    S.push(['真錢 − 紙上', `<span class="${cls(t.vs_paper)}">${pct(t.vs_paper)}</span>`]);
+    S.push(['持股', `${fmt(t.n_hold||0)} 檔`]);
+    S.push(['起始日', md(t.started)]);
+    S.push(['上次成交', md(t.last_fill)]);
+    S.push(['上次下單日', lr ? `${md(lr.date)}<small>${esc(lr.status)}</small>` : '—']);
   }else if(it.kind==='t6'){
     const st = t.stats||{};
     S.push(['總報酬', `<span class="${cls(it.tot)}">${pct(it.tot)}</span>`]);
@@ -349,6 +376,18 @@ function statsHTML(it){
     S.push(['已平倉', `${fmt(st.n_closed||0)} 筆${st.n_stop? `<small>停損 ${fmt(st.n_stop)}</small>`:''}`]);
     S.push(['勝率', st.win_rate==null ? '—' : (st.win_rate*100).toFixed(0)+'%']);
     S.push(['平均每筆', st.avg_ret==null ? '—' : `<span class="${cls(st.avg_ret)}">${pct(st.avg_ret)}</span>`]);
+  }else if(it.kind==='co'){
+    const st = t.stats||{}, ps = t.positions||[], mv = ps.reduce((s,p)=>s+(p.mv||0),0), mt = it.src.meeting;
+    S.push(['總報酬', `<span class="${cls(it.tot)}">${pct(it.tot)}</span>`]);
+    S.push(['最大回撤', `<span class="${cls(t.mdd)}">${pct(t.mdd)}</span>${t.locked ? '<small class="dn">已鎖定</small>'
+      : t.dd ? `<small>目前 ${pct(t.dd)}</small>` : ''}`]);
+    S.push(['本金', money(t.init, it.cur, 0)]);
+    S.push(['現金', money(t.cash, it.cur, 0)]);
+    S.push(['持股', `${fmt(ps.length)} 檔<small>曝險 ${it.nav ? (mv/it.nav*100).toFixed(0) : '—'}%</small>`]);
+    S.push(['已平倉', `${fmt(st.n_closed||0)} 筆${st.win_rate==null ? '' : `<small>勝率 ${(st.win_rate*100).toFixed(0)}%${st.n_stop? ' · 停損 '+fmt(st.n_stop):''}</small>`}`]);
+    S.push([`${esc(t.bench)} 同期`, t.bench_ret==null ? '—'
+      : `<span class="${cls(t.bench_ret)}">${pct(t.bench_ret)}</span><small>帳戶 ${pct(t.acct_ret)}</small>`]);
+    S.push(['上次會議', mt ? `${md(mt.date)}<small>${esc(mt.meeting)} · ${esc(mt.status)}</small>` : '—']);
   }else{
     const dr = t.drift||{}, nPos = (t.positions||[]).length;
     const nr = t.next_rebalance;
@@ -430,6 +469,41 @@ function positionsHTML(it){
       <h3 class="sh">最近平倉<span>${fmt((t.closed||[]).length)} 筆</span></h3>
       ${cl || '<div class="empty">尚無平倉紀錄</div>'}`;
   }
+  if(it.kind==='co'){
+    const pd = t.pending, al = t.alloc;
+    const tg = pd ? (pd.targets||[]).map(x=>`<div class="pr"><div><b class="num">${esc(x.sid)}</b><span class="side l">買</span>
+        <div class="nm">${esc(x.name||'')}</div></div><div class="mid"></div>
+      <div class="rt num">${(x.weight*100).toFixed(1)}%<small class="fl">目標權重</small></div></div>`).join('') : '';
+    const ps = (t.positions||[]).map(p=>{
+      const r = p.pnl_pct==null ? null : p.pnl_pct/100;
+      return `<div class="pr"><div><b class="num">${esc(p.sid)}</b>
+          <div class="nm num">${p.name? esc(p.name)+' · ':''}${md(p.entry_date)} 進 ${fmt(p.entry,2)}</div></div>
+        <div class="mid num">${qtyFmt(p.qty)} 股<br>停損 ${p.stop==null?'—':fmt(p.stop,2)}</div>
+        <div class="rt num">${fmt(p.px,2)}<small class="${cls(r)}">${pct(r,1)}</small></div></div>`;
+    }).join('');
+    const cl = (t.closed||[]).map(c=>`<div class="pr"><div><b class="num">${esc(c.sid)}</b>
+        <div class="nm num">${md(c.entry_date)} → ${md(c.exit_date)} · ${esc(c.reason||'')}</div></div>
+      <div class="mid"></div><div class="rt num"><span class="${cls(c.ret)}">${pct(c.ret,1)}</span></div></div>`).join('');
+    const pdHead = pd ? `<h3 class="sh">待執行配置<span>最早 ${md(pd.earliest)} 開盤成交</span></h3>
+      ${tg || '<div class="empty">目標全部現金 · 不買進</div>'}`
+      : `<h3 class="sh">最新配置<span>${al ? md(al.asof) : '—'}</span></h3>
+      <div class="empty">${al ? `現金 ${(al.cash_weight*100).toFixed(0)}% · ${fmt(al.n_targets)} 檔 · 已執行或未送出` : '還沒有配置'}</div>`;
+    return `${pdHead}
+      <h3 class="sh">持股<span>${fmt((t.positions||[]).length)} 檔 · 依市值 · 盤中觸及停損價就賣</span></h3>
+      ${ps || '<div class="empty">空手 · 等待會議配置</div>'}
+      <h3 class="sh">最近平倉<span>${fmt((t.closed||[]).length)} 筆</span></h3>
+      ${cl || '<div class="empty">尚無平倉紀錄</div>'}`;
+  }
+  if(it.kind==='live'){
+    const ps = (t.positions||[]).slice().sort((a,b)=>(b.pnl_pct??-1e9)-(a.pnl_pct??-1e9));
+    const rows = ps.map(p=>{
+      const r = p.pnl_pct==null ? null : p.pnl_pct/100;
+      return `<div class="pr"><div><b class="num">${esc(p.sid)}</b><div class="nm">${esc(p.name||'')}</div></div>
+        <div class="mid"></div><div class="rt num"><span class="${cls(r)}">${pct(r,1)}</span></div></div>`;
+    }).join('');
+    return `<h3 class="sh">持股<span>${fmt(ps.length)} 檔 · 損益 %(金額不公開)</span></h3>
+      ${rows || '<div class="empty">空手 · 等 main 的下一個換股日</div>'}`;
+  }
   if(it.kind==='xs'){
     const ps = (t.positions||[]).slice().sort((a,b)=>Math.abs(b.notional)-Math.abs(a.notional));
     const show = showAll ? ps : ps.slice(0, LIMIT);
@@ -473,12 +547,16 @@ function detailHTML(it){
     ? `TEXT6 · ${esc(it.src.rule||'')}<br>台北 06:30 下單、美股開盤成交、23:15 掛停損 · ${esc(t.inception||'')} 起跑 · 最後執行 ${esc(it.src.heartbeat||'—')}`
     : it.kind==='t6'
     ? `TEXT6 · ${esc(it.src.rule||'')}<br>收盤後訊號、隔天開盤成交 · ${esc(t.inception||'')} 起跑 · 資料日 ${esc(it.date||'—')}`
+    : it.kind==='co'
+    ? `TEXT6 Capital · Claude 代理人公司開會產出配置,執行長核准後下一個交易日開盤成交 · 停損 −8% · 回撤 −15% 全數出清並鎖定<br>模擬帳戶(不連券商)· ${esc(t.inception||'')} 開戶 · 資料日 ${esc(it.date||'—')}${it.us?'(美東)':''}`
+    : it.kind==='live'
+    ? `永豐 Shioaji 正式環境 · 跟紙上 main 同一套選股 · 下單日 08:50 送盤中零股<br>公開頁只顯示百分比與指數(起始 = 100),金額與股數不公開 · 資料日 ${esc(it.date||'—')}`
     : it.kind==='pbx'
     ? `${esc(t.release||'')} · 只交易 STANDARD 等級 · 每天 06:00 評估(TEXT5)<br>10/05 起才實質開始;研究階段,統計上尚未顯著`
     : `PROFILE ${esc(t.profile)} · 每 ${fmt(t.rebal_days)} 交易日換股 · 資料日 ${esc(t.data_date||'—')}`;
   return `<section class="detail" aria-label="${esc(it.sym)} 明細">
     <div class="dh"><span class="s">${esc(it.sym)}</span><span class="n">${esc(it.name)}</span><span class="dd num">${md(it.date)}</span></div>
-    <div class="big num" id="bigv">${money(it.nav, it.cur, 2)}</div>
+    <div class="big num" id="bigv">${it.kind==='live' ? fmt(it.nav, 2) : money(it.nav, it.cur, 2)}</div>
     <div class="chg num" id="chg">${headChange(it)}</div>
     <div class="seg" role="tablist">${avail.map(r=>
       `<button role="tab" data-range="${r[0]}" aria-selected="${r[0]===cur}">${r[1]}</button>`).join('')}</div>
@@ -486,7 +564,7 @@ function detailHTML(it){
     <div class="xa num" id="xa"></div>
     ${statsHTML(it)}
     ${positionsHTML(it)}
-    ${it.kind==='track' ? monthlyHTML(it) : ''}
+    ${it.kind==='track' || it.kind==='live' ? monthlyHTML(it) : ''}
     <p class="fn">${foot}</p>
   </section>`;
 }
@@ -525,7 +603,7 @@ function drawChart(it){
     const x = X(i), y = Y(v[i]), dv = v[i]-v[0], dp = v[i]/v[0]-1;
     g.style.display = ''; cl.setAttribute('x1',x); cl.setAttribute('x2',x); cc.setAttribute('cx',x); cc.setAttribute('cy',y);
     big.innerHTML = money(v[i], it.cur, 2);
-    chg.innerHTML = `<span class="${cls(dv)}">${sgn(dv)}${fmt(Math.abs(dv),2)} (${pct(dp)})</span><em>${md(pts[i][0])} · 相對 ${md(pts[0][0])}</em>`;
+    chg.innerHTML = `<span class="${cls(dv)}">${it.kind==='live' ? '' : sgn(dv)+fmt(Math.abs(dv),2)+' '}(${pct(dp)})</span><em>${md(pts[i][0])} · 相對 ${md(pts[0][0])}</em>`;
   };
   const hide = () => { g.style.display = 'none'; big.innerHTML = money(it.nav, it.cur, 2); chg.innerHTML = headChange(it); };
   box.onpointerdown = box.onpointermove = show;
@@ -553,11 +631,13 @@ function renderDetail(animate){
 }
 function render(d, xs, ext, offline){
   ITEMS = ['main','sim','wf','us1k','us10k'].filter(k=>d.tracks && d.tracks[k]).map(k=>normTrack(k, d.tracks[k]));
+  if(d.live) ITEMS.push(normLive(d.live));
   if(xs && xs.equity!=null) ITEMS.push(normXS(xs));
   if(ext && ext.alpaca) (ext.alpaca.accounts||[]).forEach(a=>ITEMS.push(normAlpaca(a, ext.alpaca)));
   if(ext && ext.pbx && ext.pbx.equity!=null) ITEMS.push(normPBX(ext.pbx));
   if(ext && ext.t6) (ext.t6.tracks||[]).forEach(t=>ITEMS.push(normT6(t, ext.t6)));
   if(ext && ext.t6us) (ext.t6us.tracks||[]).forEach(t=>ITEMS.push(normT6(t, ext.t6us, true)));
+  if(ext && ext.t6co) (ext.t6co.accounts||[]).forEach(a=>ITEMS.push(normCo(a, ext.t6co)));
   const up = String(d.updated||'');
   const m = up.match(/^(\d{4})-(\d{2})-(\d{2})\s+(\d{2}:\d{2})/);
   const sub = document.getElementById('sub');
